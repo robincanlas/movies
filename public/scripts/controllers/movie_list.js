@@ -1,9 +1,9 @@
-$.when(fetchedCollection).done(function(data){
+$.when(fetchedMovies).done(function(data){
 	this.collection = data;
-	var moviesView = new movies({collection: this.collection});
+	var moviesView = new Movies({collection: this.collection});
 	App.mainRegion.show(moviesView);
-});
 
-this.listenTo(moviesView, 'childview:show:video', function(){
-	console.log('trigger');
+	// this.listenTo(moviesView, 'childview:show:video', function(){
+	// 	console.log('trigger');
+	// });
 });

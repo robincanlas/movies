@@ -1,3 +1,3 @@
-var search = Backbone.Marionette.ItemView.extend({
+var Search = Backbone.Marionette.ItemView.extend({
 	template: '#search'
 });

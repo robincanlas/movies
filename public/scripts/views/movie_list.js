@@ -1,6 +1,6 @@
-var movie = Backbone.Marionette.ItemView.extend({
+var Movie = Backbone.Marionette.ItemView.extend({
 	template: '#movies',
-	tagName: 'li ',
+	// tagName: 'li ',
 	className: '',
 	events: {
 		'click': 'showVideo'
@@ -10,8 +10,8 @@ var movie = Backbone.Marionette.ItemView.extend({
 	}
 });
 
-var movies = Backbone.Marionette.CollectionView.extend({
-	childView: movie,
-	tagName: 'ul',
-	className: 'row'
+var Movies = Backbone.Marionette.CollectionView.extend({
+	childView: Movie,
+	// tagName: 'ul',
+	className: ''
 });
