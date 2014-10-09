@@ -107,6 +107,42 @@ App.addInitializer(function(){
 			App.mainRegion.show(moviesView);
 		});
 	});
+
+	this.listenTo(this.sidebarView, 'childview:show:years', function(){
+		var yearToday = String(new Date()).split(' ')[3];
+		var years = [];
+
+		for(var i = 1990; i <= 2014; i++){
+			var x = JSON.stringify({year: i});			
+			var y = jQuery.parseJSON(x);
+			years.push(y);
+		};
+
+		var yearsCollection = new Years(years);
+		var yearsView = new YearsView({collection: yearsCollection});
+		App.mainRegion.show(yearsView);
+
+		this.listenTo(yearsView, 'childview:filter:by:year', function(){
+			var query = new Parse.Query(information);
+			query.descending('createdAt');
+			var informations = query.collection();
+			var defer = $.Deferred();
+			informations.fetch({
+				success: function(data){
+					defer.resolve(data);
+				}
+			});
+
+			//MERGING INFO TO MOVIES COLLECTION
+			var fetchedInformations = defer.promise();
+			var infos = [];
+			$.when(fetchedInformations).done(function(data){
+				data.map(function(model){
+					infos.push(model.attributes);
+				});
+			});
+		});
+	});
 });
 
 App.addInitializer(function(){	

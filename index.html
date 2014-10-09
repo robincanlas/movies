@@ -21,6 +21,8 @@
 	  <script src="public/bower_components/underscore/underscore.js"></script>
 	  <script src="public/bower_components/backbone/backbone.js"></script>
 	  <script src="public/bower_components/marionette/lib/backbone.marionette.js"></script>
+	<script src="public/scripts/models/information.js"></script>
+	<script src="public/scripts/collections/informations.js"></script>
 	<!-- GENRE -->
 	<script src="public/scripts/models/genre.js"></script>
 	<script src="public/scripts/collections/genres.js"></script>
@@ -60,6 +62,13 @@
 	  <script src="public/scripts/controllers/sidebar_list.js"></script>
  	  <script type="text/template" id="sidebar">
 		<div <%=data%>><%=name%></div>
+  	  </script>
+  	  <!-- YEAR -->
+  	  <script src="public/scripts/models/year.js"></script>
+	  <script src="public/scripts/collections/years.js"></script>
+	  <script src="public/scripts/views/year_list.js"></script>
+ 	  <script type="text/template" id="year">
+		<div class="color-white float-left padding-5 cursor-pointer"><%=year%></div>
   	  </script>
   	  <script src="public/scripts/app.js"></script>		
 	</body>
