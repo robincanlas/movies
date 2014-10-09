@@ -58,10 +58,53 @@ App.addInitializer(function(){
 			var newFetchedMovies = defer.promise();
 			
 			$.when(newFetchedMovies).done(function(data){
-				this.collection = data;
-				var moviesView = new Movies({collection: this.collection});
+				var collection = data;
+				var moviesView = new Movies({collection: collection});
 				App.mainRegion.show(moviesView);
 			});
+		});
+
+	});
+
+	this.listenTo(this.sidebarView, 'childview:show:cinema', function(){
+		var cinemaMovieQuery = new Parse.Query(movie);
+		cinemaMovieQuery.descending('createdAt');
+		cinemaMovieQuery.equalTo('cinema_id', 1);
+		var cinemaMovieList = cinemaMovieQuery.collection();
+		var defer = $.Deferred();
+		cinemaMovieList.fetch({
+			success: function(data){
+				defer.resolve(data);
+			}
+		});
+
+		var cinemaMovies = defer.promise();
+		
+		$.when(cinemaMovies).done(function(data){
+			var collection = data;
+			var moviesView = new Movies({collection: collection});
+			App.mainRegion.show(moviesView);
+		});
+	});
+
+	this.listenTo(this.sidebarView, 'childview:show:featured', function(){
+		var featuredMovieQuery = new Parse.Query(movie);
+		featuredMovieQuery.descending('createdAt');
+		featuredMovieQuery.equalTo('cinema_id', 0);
+		var featuredMovieList = featuredMovieQuery.collection();
+		var defer = $.Deferred();
+		featuredMovieList.fetch({
+			success: function(data){
+				defer.resolve(data);
+			}
+		});
+
+		var featuredMovies = defer.promise();
+		
+		$.when(featuredMovies).done(function(data){
+			var collection = data;
+			var moviesView = new Movies({collection: collection});
+			App.mainRegion.show(moviesView);
 		});
 	});
 });
