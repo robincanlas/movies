@@ -23,6 +23,34 @@
 	  <script src="public/bower_components/marionette/lib/backbone.marionette.js"></script>
 	<script src="public/scripts/models/information.js"></script>
 	<script src="public/scripts/collections/informations.js"></script>
+	<!-- HOME -->
+	<script src="public/scripts/views/home_list.js"></script>
+	<script type="text/template" id="home-layout">
+		<div>CINEMA MOVIES</div>
+		<div id="cinema-region"></div>
+		<div>FEATURED MOVIES</div>
+		<div id="featured-region"></div>
+	</script>
+	<script type="text/template" id="cinema">
+ 	  	<div class="box padding-0-10-70 float-left">
+  			<div class="video-thumbnail text-align-center font-size-13" style="">
+	  			<a href="#">
+					<img src="<%=image%>" alt="" class="width-150-height-230">
+				</a>
+		  	  	<a href="#" class="color-ccc text-decoration-none"><%= name %></a>
+  			</div>
+ 	  	</div>	
+	</script>
+	<script type="text/template" id="featured">
+	  	<div class="box padding-0-10-70 float-left">
+			<div class="video-thumbnail text-align-center font-size-13" style="">
+				<a href="#">
+				<img src="<%=image%>" alt="" class="width-150-height-230">
+			</a>
+	  	  	<a href="#" class="color-ccc text-decoration-none"><%= name %></a>
+			</div>
+	  	</div>	
+	</script>
 	<!-- GENRE -->
 	<script src="public/scripts/models/genre.js"></script>
 	<script src="public/scripts/collections/genres.js"></script>

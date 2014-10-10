@@ -1,16 +1,42 @@
 var App = new Marionette.Application();
 
+var home = function(){
+	var homeView = new HomeLayout();
+	App.mainRegion.show(homeView);	
+
+	// CINEMA REGION
+	$.when(cinemaMoviesHome).done(function(){
+		var cinemaCollection = cinemaMoviesHome;
+		var cinemaView = new Cinemas({collection: cinemaCollection});
+		homeView.cinemaRegion.show(cinemaView);
+	});
+
+	// FEATURED REGION
+	$.when(featuredMoviesHome).done(function(){
+		var featuredCollection = featuredMoviesHome;
+		var featuredView = new Featureds({collection: featuredCollection});
+		homeView.featuredRegion.show(featuredView);
+	});
+}
+
 App.addRegions({
 	headerRegion: '#header-region',
 	sidebarRegion: '#sidebar-region',
 	mainRegion: '#main-region'
 });
 
+// HOME
+App.addInitializer(function(){	
+	home();
+});
+
+// SEARCH
 App.addInitializer(function(){	
 	var searchView = new Search();
 	App.headerRegion.show(searchView);
 });
 
+// SIDEBAR
 App.addInitializer(function(){
 	var sidebars = new Sidebars([
 		{name: 'Home', data:'data-home', id:1},
@@ -29,6 +55,19 @@ App.addInitializer(function(){
 
 App.addInitializer(function(){	
 	var that = this;
+	
+	this.listenTo(this.sidebarView, 'childview:show:home', function(){
+		home();
+	});
+
+	this.listenTo(this.sidebarView, 'childview:show:movies', function(){
+		$.when(movies).done(function(){
+			this.collection = movies;
+			var moviesView = new Movies({collection: this.collection});
+			App.mainRegion.show(moviesView);
+		});
+	});
+
 	this.listenTo(this.sidebarView, 'childview:show:genres', function(){
 		var genresCollection = new genres([
 			{type: 'Action', data:'data-action', id:'1'},
@@ -48,17 +87,10 @@ App.addInitializer(function(){
 			newMovieQuery.descending('createdAt');
 			newMovieQuery.equalTo('category', +genre);
 			var newMovieList = newMovieQuery.collection();
-			var defer = $.Deferred();
-			newMovieList.fetch({
-				success: function(data){
-					defer.resolve(data);
-				}
-			});
-
-			var newFetchedMovies = defer.promise();
+			newMovieList.fetch();
 			
-			$.when(newFetchedMovies).done(function(data){
-				var collection = data;
+			$.when(newMovieList).done(function(){
+				var collection = newMovieList;
 				var moviesView = new Movies({collection: collection});
 				App.mainRegion.show(moviesView);
 			});
@@ -66,43 +98,17 @@ App.addInitializer(function(){
 
 	});
 
-	this.listenTo(this.sidebarView, 'childview:show:cinema', function(){
-		var cinemaMovieQuery = new Parse.Query(movie);
-		cinemaMovieQuery.descending('createdAt');
-		cinemaMovieQuery.equalTo('cinema_id', 1);
-		var cinemaMovieList = cinemaMovieQuery.collection();
-		var defer = $.Deferred();
-		cinemaMovieList.fetch({
-			success: function(data){
-				defer.resolve(data);
-			}
-		});
-
-		var cinemaMovies = defer.promise();
-		
-		$.when(cinemaMovies).done(function(data){
-			var collection = data;
+	this.listenTo(this.sidebarView, 'childview:show:cinema', function(){	
+		$.when(cinemaMoviesHome).done(function(){
+			var collection = cinemaMoviesHome;
 			var moviesView = new Movies({collection: collection});
 			App.mainRegion.show(moviesView);
 		});
 	});
 
-	this.listenTo(this.sidebarView, 'childview:show:featured', function(){
-		var featuredMovieQuery = new Parse.Query(movie);
-		featuredMovieQuery.descending('createdAt');
-		featuredMovieQuery.equalTo('cinema_id', 0);
-		var featuredMovieList = featuredMovieQuery.collection();
-		var defer = $.Deferred();
-		featuredMovieList.fetch({
-			success: function(data){
-				defer.resolve(data);
-			}
-		});
-
-		var featuredMovies = defer.promise();
-		
-		$.when(featuredMovies).done(function(data){
-			var collection = data;
+	this.listenTo(this.sidebarView, 'childview:show:featured', function(){		
+		$.when(featuredMoviesHome).done(function(){
+			var collection = featuredMoviesHome;
 			var moviesView = new Movies({collection: collection});
 			App.mainRegion.show(moviesView);
 		});
@@ -112,7 +118,7 @@ App.addInitializer(function(){
 		var yearToday = String(new Date()).split(' ')[3];
 		var years = [];
 
-		for(var i = 1990; i <= 2014; i++){
+		for(var i = 1980; i <= 2014; i++){
 			var x = JSON.stringify({year: i});			
 			var y = jQuery.parseJSON(x);
 			years.push(y);
@@ -122,24 +128,33 @@ App.addInitializer(function(){
 		var yearsView = new YearsView({collection: yearsCollection});
 		App.mainRegion.show(yearsView);
 
-		this.listenTo(yearsView, 'childview:filter:by:year', function(){
-			var query = new Parse.Query(information);
-			query.descending('createdAt');
-			var informations = query.collection();
+		this.listenTo(yearsView, 'childview:filter:by:year', function(iv){
+			var moviePerYear = new Parse.Query(movie)
+				.descending('createdAt')
+				.include('test');
+			var newList = moviePerYear.collection();
 			var defer = $.Deferred();
-			informations.fetch({
+			newList.fetch({
 				success: function(data){
 					defer.resolve(data);
 				}
 			});
 
-			//MERGING INFO TO MOVIES COLLECTION
-			var fetchedInformations = defer.promise();
-			var infos = [];
-			$.when(fetchedInformations).done(function(data){
+			var yearSelected = iv.model.get('year');
+			var temp = [];			
+			var fetchedMovies = defer.promise();
+			$.when(fetchedMovies).done(function(data){
+				this.collection = data;
 				data.map(function(model){
-					infos.push(model.attributes);
+					var info = model.get('test');
+					var movieYear = info.get('year');
+					if( yearSelected === movieYear ) {
+						temp.push(model);
+					}
 				});
+				this.collection.reset(temp);
+				var moviesView = new Movies({collection: this.collection});
+				App.mainRegion.show(moviesView);
 			});
 		});
 	});
