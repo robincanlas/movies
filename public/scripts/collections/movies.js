@@ -2,6 +2,10 @@ var moviesCollection = Parse.Collection.extend({
 	model: movie
 });
 
+var informations = Parse.Collection.extend({
+	model: information
+});
+
 var query = new Parse.Query(movie)
 	.descending('createdAt')
 	.include('test');

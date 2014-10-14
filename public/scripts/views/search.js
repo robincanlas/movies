@@ -1,7 +1,8 @@
 var Search = Backbone.Marionette.ItemView.extend({
 	template: '#search',
 	ui: {
-		input: 'input'
+		input: 'input',
+		select: 'select'
 	},
 	events: {
 		'keyup': 'enter'

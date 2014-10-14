@@ -37,12 +37,27 @@ var filter = function(columnName, id){
 	return deferFilter.promise();
 };
 
+var search = function(columnName, string){
+	var movies = new Parse.Query(movie)
+		.descending('createdAt')
+		.include('test')
+		.matches(columnName, string);
+	var movieList = movies.collection();
+	var deferSearch = $.Deferred();
+	movieList.fetch({
+		success: function(data){
+			deferSearch.resolve(data);
+		}
+	});
+	return deferSearch.promise();
+};
+
 var showDetails = function(view){
 	view.on('childview:show:details', function(iv){
 		var detailsView = new Details({model: iv.model});
 		App.mainRegion.show(detailsView);
 	});
-}
+};
 
 App.addRegions({
 	headerRegion: '#header-region',
@@ -61,6 +76,40 @@ App.addInitializer(function(){
 App.addInitializer(function(){	
 	var searchView = new Search();
 	App.headerRegion.show(searchView);
+
+	this.listenTo(searchView,'search:movie', function(){
+		// if (  ) {
+
+		// }
+		// var selectedOption = searchView.ui.select.val();
+		// var text = searchView.ui.input.val();
+		// var re = new RegExp(text, "i");
+		// var moviesSearch = search(selectedOption, re);
+
+		var selectedOption = searchView.ui.select.val();
+		var text = searchView.ui.input.val();
+		var re = new RegExp(text, "i");
+		// var moviesSearch = search('name', re);
+
+		var test = new Parse.Query(movie)
+			.include('test')
+			.matches('director', 'Wes Craven');
+		var movieList = test.collection();
+		var deferSearch = $.Deferred();
+		movieList.fetch({
+			success: function(data){
+				console.log(data);
+				deferSearch.resolve(data);
+			}
+		});
+
+		$.when(moviesSearch).done(function(data){
+			this.collection = data;
+			var moviesView = new Movies({collection: this.collection});
+			App.mainRegion.show(moviesView);
+			showDetails(moviesView);
+		});
+	});
 });
 
 // SIDEBAR
