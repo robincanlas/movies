@@ -1,5 +1,6 @@
 var YearView = Backbone.Marionette.ItemView.extend({
 	template: '#year',
+	className: 'large-3 columns',
 	events: {
 		'click': 'showByYear'
 	},
@@ -9,5 +10,6 @@ var YearView = Backbone.Marionette.ItemView.extend({
 });
 
 var YearsView = Backbone.Marionette.CollectionView.extend({
-	childView: YearView
+	childView: YearView,
+	className: 'row',
 });

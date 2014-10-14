@@ -6,6 +6,7 @@ var query = new Parse.Query(movie)
 	.descending('createdAt')
 	.include('test');
 var movies = query.collection();
+var defer = $.Deferred();
 movies.fetch();
 
 // FEATURED

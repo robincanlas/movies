@@ -1,18 +1,15 @@
 var Movie = Backbone.Marionette.ItemView.extend({
 	template: '#movies',
+	className: 'large-6 columns',
 	events: {
-		'click': 'showVideo',
-		'click': 'test'
+		'click': 'showDetails'
 	},
-	showVideo: function(){
-		this.trigger('show:video', this);
+	showDetails: function(){
+		this.trigger('show:details', this);
 	},
-	test: function(){
-		console.log(this.model.get('test'));
-	}
 });
 
 var Movies = Backbone.Marionette.CollectionView.extend({
 	childView: Movie,
-	className: ''
+	className: 'row'
 });
