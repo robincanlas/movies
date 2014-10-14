@@ -13,6 +13,7 @@ movies.fetch();
 var featuredMoviesHome = new Parse.Query(movie)
 	.descending('createdAt')
 	.equalTo('cinema_id', 0)
+	.limit(8)
 	.include('test');
 var featuredMoviesHome = featuredMoviesHome.collection();
 featuredMoviesHome.fetch();
@@ -21,6 +22,7 @@ featuredMoviesHome.fetch();
 var cinemaMoviesHome = new Parse.Query(movie)
 	.descending('createdAt')
 	.equalTo('cinema_id', 1)
+	.limit(8)
 	.include('test');
 var cinemaMoviesHome = cinemaMoviesHome.collection();
 cinemaMoviesHome.fetch();
