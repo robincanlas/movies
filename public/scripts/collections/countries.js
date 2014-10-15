@@ -7,3 +7,7 @@ var countryCollection = new Countries([
 	{name: 'United Kingdom', data:'data-uk', id:'2'},
 	{name: 'Japan', data:'data-jp', id:'3'}
 ]);
+
+var Empty = Backbone.Collection.extend({
+	model: country
+});

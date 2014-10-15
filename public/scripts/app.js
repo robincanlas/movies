@@ -38,18 +38,25 @@ var filter = function(columnName, id){
 };
 
 var search = function(columnName, string){
-	var movies = new Parse.Query(movie)
-		.descending('createdAt')
-		.include('test')
-		.matches(columnName, string);
-	var movieList = movies.collection();
-	var deferSearch = $.Deferred();
-	movieList.fetch({
-		success: function(data){
-			deferSearch.resolve(data);
-		}
-	});
-	return deferSearch.promise();
+	if ( columnName === 'name' ) {
+		var query = new Parse.Query(movie)
+			.descending('createdAt')
+			.include('test')
+			.matches(columnName, string);
+	} else {
+		// FOR SEARCHING INSIDE THE POINTER
+		var innerQuery = new Parse.Query(information);
+		innerQuery.matches(columnName, string);
+		var query = new Parse.Query(movie);
+		query.matchesQuery("test", innerQuery);
+		query.find({
+		  success: function(data) {}
+		});
+	}
+
+	var movieList = query.collection();
+	movieList.fetch();
+	return movieList;
 };
 
 var showDetails = function(view){
@@ -78,33 +85,35 @@ App.addInitializer(function(){
 	App.headerRegion.show(searchView);
 
 	this.listenTo(searchView,'search:movie', function(){
-		// if (  ) {
-
-		// }
-		// var selectedOption = searchView.ui.select.val();
-		// var text = searchView.ui.input.val();
-		// var re = new RegExp(text, "i");
-		// var moviesSearch = search(selectedOption, re);
-
 		var selectedOption = searchView.ui.select.val();
 		var text = searchView.ui.input.val();
 		var re = new RegExp(text, "i");
-		// var moviesSearch = search('name', re);
+		if ( selectedOption === 'actor' ) {
+			var test = new Parse.Query(actor)
+				.descending('createdAt')
+				.include('films')
+				.matches('name', re);
+			var fetchActors = test.collection();
+			var defer = $.Deferred();
+			fetchActors.fetch({
+				success: function(data){
+					defer.resolve(data);
+				}
+			});
+			var x = defer.promise();
+			$.when(x).done(function(data){
+				data.map(function(model){
+					console.log(model.toJSON());
+					var col = new Empty(model.toJSON().films);
+					// console.log(col);
+				});
+			});
+		}else{
+			var moviesSearch = search(selectedOption, re);			
+		}
 
-		var test = new Parse.Query(movie)
-			.include('test')
-			.matches('director', 'Wes Craven');
-		var movieList = test.collection();
-		var deferSearch = $.Deferred();
-		movieList.fetch({
-			success: function(data){
-				console.log(data);
-				deferSearch.resolve(data);
-			}
-		});
-
-		$.when(moviesSearch).done(function(data){
-			this.collection = data;
+		$.when(moviesSearch).done(function(){
+			this.collection = moviesSearch;
 			var moviesView = new Movies({collection: this.collection});
 			App.mainRegion.show(moviesView);
 			showDetails(moviesView);
