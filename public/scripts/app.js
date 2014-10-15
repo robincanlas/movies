@@ -1,5 +1,9 @@
 var App = new Marionette.Application();
 
+// App = {
+// 	home: function()
+// }
+
 var that = this;
 
 var home = function(){
@@ -72,7 +76,7 @@ App.addRegions({
 	mainRegion: '#main-region'
 });
 
-// HOME
+// // HOME
 App.addInitializer(function(){	
 	home();
 	showDetails(cinemaView);
@@ -101,39 +105,33 @@ App.addInitializer(function(){
 				}
 			});
 			var x = defer.promise();
+			var temp = [];
 			$.when(x).done(function(data){
 				data.map(function(model){
-					console.log(model.toJSON());
-					var col = new Empty(model.toJSON().films);
-					// console.log(col);
+					var x = model.get('films');
+					x.map(function(films){
+						temp.push(films.toJSON());
+					});
 				});
+				var collectionByActor = new Empty(temp);
+				var moviesView = new Movies({collection: collectionByActor});
+				App.mainRegion.show(moviesView);
+				showDetails(moviesView);
 			});
 		}else{
 			var moviesSearch = search(selectedOption, re);			
+			$.when(moviesSearch).done(function(){
+				this.collection = moviesSearch;
+				var moviesView = new Movies({collection: this.collection});
+				App.mainRegion.show(moviesView);
+				showDetails(moviesView);
+			});
 		}
-
-		$.when(moviesSearch).done(function(){
-			this.collection = moviesSearch;
-			var moviesView = new Movies({collection: this.collection});
-			App.mainRegion.show(moviesView);
-			showDetails(moviesView);
-		});
 	});
 });
 
 // SIDEBAR
 App.addInitializer(function(){
-	var sidebars = new Sidebars([
-		{name: 'Home', data:'data-home', id:1},
-		{name: 'Movies', data:'data-movies', id:2},
-		{name: 'Genres', data:'data-genres', id:3},
-		{name: 'Cinema', data:'data-cinema', id:4},
-		{name: 'Featured', data:'data-featured', id:5},
-		{name: 'Years', data:'data-years', id:6},
-		{name: 'Countries', data:'data-countries', id:7},				
-		{name: 'Languages', data:'data-languages', id:8},
-	]);
-
 	this.sidebarView = new Names({collection:sidebars});
 	App.sidebarRegion.show(this.sidebarView);
 });
@@ -160,16 +158,7 @@ App.addInitializer(function(){
 	});
 
 	this.listenTo(this.sidebarView, 'childview:show:genres', function(){
-		var genresCollection = new genres([
-			{name: 'Action', data:'data-action', id:'1'},
-			{name: 'Horror', data:'data-horror', id:'2'},
-			{name: 'Sci-Fi', data:'data-comedy', id:'3'},
-			{name: 'Thriller', data:'data-thriller',id:'4'},
-			{name: 'Adventure', data:'data-adventure',id:'5'},
-			{name: 'Animation', data:'data-animation',id:'6'},
-			{name: 'Comedy', data:'data-sci-fi',id:'7'},				
-			{name: 'War', data:'data-war',id:'8'},
-		]);
+
 		this.genreView = new Genres({collection: genresCollection});
 		App.mainRegion.show(this.genreView);
 	
